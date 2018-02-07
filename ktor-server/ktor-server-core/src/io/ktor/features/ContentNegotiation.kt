@@ -7,6 +7,7 @@ import io.ktor.pipeline.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.util.*
+import kotlinx.coroutines.experimental.io.*
 import java.nio.charset.Charset
 
 /**
@@ -80,7 +81,7 @@ class ContentNegotiation(val registrations: List<ConverterRegistration>) {
             }
 
             pipeline.receivePipeline.intercept(ApplicationReceivePipeline.Transform) {
-                if (subject.value !is IncomingContent) return@intercept
+                if (subject.value !is ByteReadChannel) return@intercept
                 val contentType = call.request.contentType().withoutParameters()
                 val suitableConverter = feature.registrations.firstOrNull { it.contentType.match(contentType) }
                         ?: throw UnsupportedMediaTypeException(contentType)
